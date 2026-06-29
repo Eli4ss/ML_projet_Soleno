@@ -116,8 +116,11 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
     rmse = float(np.sqrt(mean_squared_error(y_true, y_pred)))
     r2 = r2_score(y_true, y_pred) if len(y_true) > 1 else np.nan
     mape = float(np.mean(np.abs((y_true - y_pred) / np.clip(np.abs(y_true), 1e-6, None))) * 100)
-    from scipy.stats import spearmanr
-    sp, _ = spearmanr(y_true, y_pred)
+    if len(y_true) > 1 and np.nanstd(y_true) > 0 and np.nanstd(y_pred) > 0:
+        from scipy.stats import spearmanr
+        sp, _ = spearmanr(y_true, y_pred)
+    else:
+        sp = np.nan
     return {"mae": mae, "rmse": rmse, "r2": r2, "mape": mape, "spearman": float(sp)}
 
 
