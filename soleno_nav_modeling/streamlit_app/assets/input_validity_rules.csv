@@ -1,0 +1,13 @@
+feature,min_plausible,max_plausible,unit,optional_zero
+mi,0,100,g/10min,false
+hlmi,0,1000,g/10min,false
+density_g_cm3,0.90,1.10,g/cm3,false
+carbon_black,0,10,%,true
+ash,0,50,%,true
+pp,0,100,%,true
+onset,100,300,°C,true
+peak,110,320,°C,true
+delta_h,0,200,J/g,true
+fluidity_g_10min,0,100,g/10min,true
+frr,0,500,ratio,true
+charge_total,0,60,%,true

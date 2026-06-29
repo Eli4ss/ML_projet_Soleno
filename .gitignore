@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets
+.env
+.env.*
+*.pem
+
+# ML artifacts (regenerate with pipeline)
+soleno_nav_modeling/outputs/
+soleno_nav_modeling/streamlit_app/outputs/
+*.pkl
+*.joblib
+*.h5
+*.onnx
+*.pt
+*.pth
+
+# Raw data (place Excel files in soleno_nav_modeling/data/raw/ locally)
+*.xlsx
+*.xls
+*.csv
+!soleno_nav_modeling/streamlit_app/assets/input_validity_rules.csv
+
+# Logs
+*.log

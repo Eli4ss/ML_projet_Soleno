@@ -1,0 +1,12 @@
+# Overrides optionnels des niveaux de maturité par cible.
+# Si absent ou vide, les statuts sont dérivés de phase 5 (target_deployment_status.csv).
+#
+# Exemple :
+# targets:
+#   oit_min:
+#     level: pilot
+#     allowed_for_prediction: true
+#     requires_lab_confirmation: true
+#     note: "Override manuel pour démo"
+
+targets: {}
