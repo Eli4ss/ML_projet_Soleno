@@ -137,6 +137,39 @@ def apply_target_flags(df: pd.DataFrame, target: str, rule: dict) -> pd.DataFram
     return out
 
 
+def _tercile_class_labels(series: pd.Series) -> pd.Series:
+    """Assigne faible / moyen / élevé ; gère distributions dégénérées (ex. beaucoup de zéros)."""
+    yv = pd.to_numeric(series, errors="coerce")
+    labeled = yv.dropna()
+    if len(labeled) < 9:
+        return pd.Series(np.nan, index=series.index, dtype=object)
+
+    q = labeled.quantile([0, 1 / 3, 2 / 3, 1.0]).values
+    bins = np.unique(np.concatenate(([-np.inf], q, [np.inf])))
+    if len(bins) < 2:
+        bins = np.array([labeled.min(), labeled.max()])
+
+    n_bins = len(bins) - 1
+    label_pool = ["faible", "moyen", "élevé"]
+    labels = label_pool[:n_bins] if n_bins <= 3 else label_pool + [f"g{i}" for i in range(n_bins - 3)]
+
+    try:
+        return pd.cut(
+            yv,
+            bins=bins,
+            labels=labels,
+            include_lowest=True,
+            duplicates="drop",
+        )
+    except (ValueError, TypeError):
+        med = float(labeled.median())
+        return pd.Series(
+            np.where(yv.isna(), np.nan, np.where(yv <= med, "faible", "élevé")),
+            index=yv.index,
+            dtype=object,
+        )
+
+
 def winsorize_series(y: pd.Series, low_p: float = 1, high_p: float = 99) -> pd.Series:
     s = y.copy()
     valid = s.dropna()
@@ -186,12 +219,7 @@ def build_corrected_versions(df: pd.DataFrame, target: str, rule: dict, out_dir:
     yv = pd.to_numeric(cls_df[target], errors="coerce")
     labeled = yv.dropna()
     if len(labeled) >= 9:
-        q33, q66 = np.percentile(labeled, [33.33, 66.67])
-        cls_df[f"{target}_class"] = pd.cut(
-            yv,
-            bins=[-np.inf, q33, q66, np.inf],
-            labels=["faible", "moyen", "élevé"],
-        )
+        cls_df[f"{target}_class"] = _tercile_class_labels(cls_df[target])
     cls_path = out_dir / f"target_classification_{target}.csv"
     cls_df.to_csv(cls_path, index=False)
 
