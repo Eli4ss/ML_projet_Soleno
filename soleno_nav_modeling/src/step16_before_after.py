@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from .config import METRICS, PHASE1_METRICS, PHASE2_COMPARISON, PHASE2_MODELING
-from .utils import ensure_dirs
+from .utils import df_to_markdown, ensure_dirs
 
 
 def _best_phase1(reg_old: pd.DataFrame) -> pd.DataFrame:
@@ -115,7 +115,7 @@ def run_step16() -> pd.DataFrame:
         "5. **Ranking** : voir `ml_ranking_results.csv`.",
         "6. **Modèle B vs A** : comparer par `model_version`.",
         "",
-        summary.to_markdown(index=False) if hasattr(summary, "to_markdown") else "",
+        df_to_markdown(summary, index=False),
     ]
     (PHASE2_COMPARISON / "before_after_comparison_report.md").write_text("\n".join(report), encoding="utf-8")
     return summary

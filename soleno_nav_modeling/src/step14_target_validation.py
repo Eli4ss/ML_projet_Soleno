@@ -9,7 +9,7 @@ from scipy import stats
 
 from .config import PHASE2_VALIDATION, TABLES, TARGET_COLUMNS
 from .target_rules import RULE_COLUMNS, get_rule, rules_dataframe
-from .utils import ensure_dirs
+from .utils import df_to_markdown, ensure_dirs
 
 
 def _robust_zscore(s: pd.Series) -> pd.Series:
@@ -333,14 +333,19 @@ def run_step14(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, Path]:
     outlier_df.to_csv(PHASE2_VALIDATION / "target_outlier_summary.csv", index=False)
 
     # flags globaux (une ligne par index, colonnes par cible simplifiées)
-    flags_global = df.copy()
+    flag_frames: list[pd.DataFrame] = []
     for target in TARGET_COLUMNS:
         if target not in df.columns:
             continue
         fl = apply_target_flags(df, target, get_rule(target))
-        for c in fl.columns:
-            if c.startswith("target_"):
-                flags_global[f"{target}__{c}"] = fl[c]
+        flag_cols = {
+            f"{target}__{c}": fl[c]
+            for c in fl.columns
+            if c.startswith("target_")
+        }
+        if flag_cols:
+            flag_frames.append(pd.DataFrame(flag_cols))
+    flags_global = pd.concat([df, *flag_frames], axis=1)
     flags_global.to_csv(PHASE2_VALIDATION / "target_quality_flags.csv", index=False)
 
     summary = []
@@ -370,11 +375,11 @@ def run_step14(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, Path]:
         "",
         "## Synthèse",
         "",
-        dist_df.to_markdown(index=False) if hasattr(dist_df, "to_markdown") else str(dist_df.head()),
+        df_to_markdown(dist_df, index=False, default=str(dist_df.head())),
         "",
         "## Décisions",
         "",
-        decision_df.to_markdown(index=False) if hasattr(decision_df, "to_markdown") else "",
+        df_to_markdown(decision_df, index=False),
         "",
         "## Notes",
         "- `temp_c` : reclassée variable procédé, hors modélisation cible.",

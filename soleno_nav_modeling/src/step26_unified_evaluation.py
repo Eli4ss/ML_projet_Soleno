@@ -11,7 +11,7 @@ from .evaluation_standard import (
     TARGET_TIERS,
     VALIDATION_SCHEME_LABELS,
 )
-from .utils import ensure_dirs
+from .utils import df_to_markdown, ensure_dirs
 
 
 def _load_robust_results() -> pd.DataFrame:
@@ -61,7 +61,7 @@ def _build_report(
             "r2_random", "r2_group_supplier", "mae_degradation_ratio", "status_reason",
         ]
         show = recommended[[c for c in cols if c in recommended.columns]]
-        lines.append(show.to_markdown(index=False))
+        lines.append(df_to_markdown(show, index=False))
 
     lines += [
         "",
@@ -86,7 +86,7 @@ def _build_report(
             )
             .round(3)
         )
-        lines.append(pivot.to_markdown())
+        lines.append(df_to_markdown(pivot))
 
     lines += [
         "",

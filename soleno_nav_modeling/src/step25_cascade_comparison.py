@@ -23,7 +23,7 @@ from .config import (
     PHASE4_COMPARISON,
     REPORTS,
 )
-from .utils import ensure_dirs
+from .utils import df_to_markdown, ensure_dirs
 
 APPROACH_LABELS = CASCADE_APPROACH_LABELS
 
@@ -131,21 +131,21 @@ def _build_markdown_report(
         "",
     ]
     if not pivot_r2.empty:
-        lines.append(pivot_r2.to_markdown())
+        lines.append(df_to_markdown(pivot_r2))
     lines += [
         "",
         "## 3. MAE par cible et approche",
         "",
     ]
     if not pivot_mae.empty:
-        lines.append(pivot_mae.to_markdown())
+        lines.append(df_to_markdown(pivot_mae))
     lines += [
         "",
         "## 4. Approche gagnante par cible",
         "",
     ]
     if not winner.empty:
-        lines.append(winner[["target", "approach_label", "algorithm", "r2", "mae"]].to_markdown(index=False))
+        lines.append(df_to_markdown(winner[["target", "approach_label", "algorithm", "r2", "mae"]], index=False))
     lines += [
         "",
         "## 5. Gain cascade vs direct sur les cibles finales",
@@ -155,7 +155,7 @@ def _build_markdown_report(
         "",
     ]
     if not gain.empty:
-        lines.append(gain.to_markdown(index=False))
+        lines.append(df_to_markdown(gain, index=False))
 
     lines += [
         "",

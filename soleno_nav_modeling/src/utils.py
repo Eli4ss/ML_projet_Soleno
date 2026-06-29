@@ -86,3 +86,13 @@ def coerce_numeric_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 
 def project_path(*parts: str) -> Path:
     return PROJECT_ROOT.joinpath(*parts)
+
+
+def df_to_markdown(df: pd.DataFrame, *, index: bool = False, default: str = "") -> str:
+    """Render a DataFrame as markdown; fall back if tabulate is not installed."""
+    if df is None or df.empty:
+        return default
+    try:
+        return df.to_markdown(index=index)
+    except ImportError:
+        return df.to_string(index=index)
